@@ -5,21 +5,101 @@ local Plug = vim.fn['plug#']
 vim.call('plug#begin')
 
 Plug('junegunn/fzf', { ['do'] = vim.fn['fzf#install']})
+Plug('junegunn/fzf.vim')
 
 Plug('nvim-treesitter/nvim-treesitter', {['do'] = vim.fn[':TSUpdate']});
 Plug('nvim-treesitter/nvim-treesitter-context'); 
 
 Plug('mfussenegger/nvim-dap');
+Plug('rcarriga/nvim-dap-ui');
 
 Plug('mrcjkb/rustaceanvim');
 
+Plug('hashivim/vim-terraform');
+
+Plug('folke/tokyonight.nvim');
+
+Plug('hrsh7th/cmp-path');
+Plug('hrsh7th/cmp-buffer');
+Plug('hrsh7th/cmp-cmdline');
+Plug('hrsh7th/cmp-nvim-lsp');
+Plug('hrsh7th/cmp-vsnip');
+Plug('hrsh7th/vim-vsnip');
+Plug('hrsh7th/nvim-cmp');
+
 vim.call('plug#end')
 
+-- colors
+vim.cmd[[colorscheme tokyonight]]
+
+-- completion
+require'cmp'.setup {
+  sources = {
+    { name = 'nvim_lsp' }
+  }
+}
+
+-- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers..
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+local cmp = require'cmp'
+cmp.setup({
+  -- Enable LSP snippets
+  snippet = {
+    expand = function(args)
+        vim.fn["vsnip#anonymous"](args.body)
+    end,
+  },
+  mapping = {
+    ['<C-p>'] = cmp.mapping.select_prev_item(),
+    ['<C-n>'] = cmp.mapping.select_next_item(),
+    -- Add tab support
+    ['<S-Tab>'] = cmp.mapping.select_prev_item(),
+    ['<Tab>'] = cmp.mapping.select_next_item(),
+    ['<C-d>'] = cmp.mapping.scroll_docs(-4),
+    ['<C-f>'] = cmp.mapping.scroll_docs(4),
+    ['<C-Space>'] = cmp.mapping.complete(),
+    ['<C-e>'] = cmp.mapping.close(),
+    ['<CR>'] = cmp.mapping.confirm({
+      behavior = cmp.ConfirmBehavior.Insert,
+      select = true,
+    })
+  },
+
+  -- Installed sources
+  sources = {
+    { name = 'nvim_lsp' },
+    { name = 'vsnip' },
+    { name = 'path' },
+    { name = 'buffer' },
+  },
+})
 
 -- keybindings
 vim.g.mapleader = ","
--- Key mappings for FZF and Rg
+
 vim.api.nvim_set_keymap('n', '<leader>f', ':FZF<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>F', ':FZF ~<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>r', ':Rg<cr>', { noremap = true, silent = true })
 
+vim.api.nvim_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.implementation()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'gn', '<cmd>lua vim.lsp.buf.type_definition()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'gr', '<cmd>lua vim.lsp.buf.references()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'g0', '<cmd>lua vim.lsp.buf.document_symbol()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'gW', '<cmd>lua vim.lsp.buf.workspace_symbol()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'gd', '<cmd>lua vim.lsp.buf.definition()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'ga', '<cmd>lua vim.lsp.buf.code_action()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'gR', '<cmd>lua vim.lsp.buf.rename()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<C-]>', '<cmd>lua vim.lsp.buf.definition()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>', { noremap = true, silent = true })
+
+vim.api.nvim_set_keymap('n', 'g[', '<cmd>lua vim.diagnostic.goto_prev()<CR>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', 'g]', '<cmd>lua vim.diagnostic.goto_next()<CR>', { noremap = true, silent = true })
+
+
+-- grep
+vim.opt.grepprg = "rg --vimgrep"
+vim.opt.grepformat = "%f:%l:%c:%m"
+
+-- fixed gutter
+vim.opt.signcolumn = "yes"
