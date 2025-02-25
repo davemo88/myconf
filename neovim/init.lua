@@ -81,6 +81,17 @@ vim.api.nvim_set_keymap('n', '<leader>f', ':FZF<cr>', { noremap = true, silent =
 vim.api.nvim_set_keymap('n', '<leader>F', ':FZF ~<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>r', ':Rg<cr>', { noremap = true, silent = true })
 
+vim.keymap.set("v", "<leader>y", '"+y', { noremap = true })
+vim.keymap.set("n", "<leader>Y", '"+yg_', { noremap = true })
+vim.keymap.set("n", "<leader>y", '"+y', { noremap = true })
+vim.keymap.set("n", "<leader>yy", '"+yy', { noremap = true })
+vim.keymap.set("n", "<leader>p", '"+p', { noremap = true })
+vim.keymap.set("n", "<leader>P", '"+P', { noremap = true })
+vim.keymap.set("v", "<leader>p", '"+p', { noremap = true })
+vim.keymap.set("v", "<leader>P", '"+P', { noremap = true })
+
+vim.env.FZF_DEFAULT_COMMAND = 'fd --type f'
+
 vim.api.nvim_set_keymap('n', 'K', '<cmd>lua vim.lsp.buf.hover()<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', 'gD', '<cmd>lua vim.lsp.buf.implementation()<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', 'gn', '<cmd>lua vim.lsp.buf.type_definition()<CR>', { noremap = true, silent = true })
@@ -96,6 +107,13 @@ vim.api.nvim_set_keymap('n', '<C-k>', '<cmd>lua vim.lsp.buf.signature_help()<CR>
 vim.api.nvim_set_keymap('n', 'g[', '<cmd>lua vim.diagnostic.goto_prev()<CR>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', 'g]', '<cmd>lua vim.diagnostic.goto_next()<CR>', { noremap = true, silent = true })
 
+vim.o.updatetime = 300
+vim.api.nvim_create_autocmd("CursorHold", {
+    pattern = "*",
+    callback = function()
+        vim.diagnostic.open_float(nil, { focusable = false })
+    end,
+})
 
 -- grep
 vim.opt.grepprg = "rg --vimgrep"
