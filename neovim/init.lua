@@ -27,6 +27,9 @@ Plug('hrsh7th/cmp-vsnip');
 Plug('hrsh7th/vim-vsnip');
 Plug('hrsh7th/nvim-cmp');
 
+Plug('Canop/nvim-bacon');
+Plug('stevearc/aerial.nvim');
+
 vim.call('plug#end')
 
 -- colors
@@ -74,12 +77,26 @@ cmp.setup({
   },
 })
 
+require("aerial").setup({
+  -- optionally use on_attach to set keymaps when aerial has attached to a buffer
+  on_attach = function(bufnr)
+    -- Jump forwards/backwards with '{' and '}'
+    vim.keymap.set("n", "{", "<cmd>AerialPrev<CR>", { buffer = bufnr })
+    vim.keymap.set("n", "}", "<cmd>AerialNext<CR>", { buffer = bufnr })
+  end,
+})
+
 -- keybindings
 vim.g.mapleader = ","
+
+vim.api.nvim_create_user_command('W', 'w', {})
+vim.api.nvim_create_user_command('Q', 'q', {})
 
 vim.api.nvim_set_keymap('n', '<leader>f', ':FZF<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>F', ':FZF ~<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>r', ':Rg<cr>', { noremap = true, silent = true })
+
+vim.keymap.set("n", "<leader>a", "<cmd>AerialToggle!<CR>")
 
 vim.keymap.set("v", "<leader>y", '"+y', { noremap = true })
 vim.keymap.set("n", "<leader>Y", '"+yg_', { noremap = true })
