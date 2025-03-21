@@ -33,7 +33,7 @@ Plug('stevearc/aerial.nvim');
 vim.call('plug#end')
 
 -- colors
-vim.cmd[[colorscheme tokyonight]]
+vim.cmd[[colorscheme tokyonight-night]]
 
 -- completion
 require'cmp'.setup {
@@ -138,3 +138,12 @@ vim.opt.grepformat = "%f:%l:%c:%m"
 
 -- fixed gutter
 vim.opt.signcolumn = "yes"
+
+vim.api.nvim_create_autocmd("VimEnter", {
+    callback = function()
+        -- Check if there are no files in the arguments
+        if vim.fn.argc() == 0 then
+            vim.cmd("FZF")
+        end
+    end,
+})
