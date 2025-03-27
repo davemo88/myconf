@@ -4,8 +4,12 @@ local Plug = vim.fn['plug#']
 -- plugins
 vim.call('plug#begin')
 
-Plug('junegunn/fzf', { ['do'] = vim.fn['fzf#install']})
-Plug('junegunn/fzf.vim')
+Plug('junegunn/fzf', { ['do'] = vim.fn['fzf#install']});
+Plug('junegunn/fzf.vim');
+
+Plug('neovim/nvim-lspconfig');
+Plug('nvim-lua/plenary.nvim');
+Plug('pmizio/typescript-tools.nvim');
 
 Plug('nvim-treesitter/nvim-treesitter', {['do'] = vim.fn[':TSUpdate']});
 Plug('nvim-treesitter/nvim-treesitter-context'); 
@@ -41,6 +45,15 @@ require'cmp'.setup {
     { name = 'nvim_lsp' }
   }
 }
+
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = "typescriptreact",
+    callback = function()
+        vim.bo.tabstop = 2
+        vim.bo.shiftwidth = 2
+        vim.bo.expandtab = true
+    end,
+})
 
 -- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers..
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
