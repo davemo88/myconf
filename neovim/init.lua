@@ -60,8 +60,10 @@ require'cmp'.setup {
   }
 }
 
+require("typescript-tools").setup{}
+
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = "typescriptreact",
+    pattern = { "typescript", "typescriptreact" },
     callback = function()
         vim.bo.tabstop = 2
         vim.bo.shiftwidth = 2
