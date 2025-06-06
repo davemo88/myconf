@@ -45,13 +45,14 @@ vim.cmd[[colorscheme tokyonight-night]]
 require('claude-code').setup({
   -- Terminal window settings
   window = {
+    split_ratio = 0.5,
     position = "botright vsplit",  -- Position of the window: "botright", "topleft", "vertical", "rightbelow vsplit", etc.
     enter_insert = true,    -- Whether to enter insert mode when opening Claude Code
     hide_numbers = true,    -- Hide line numbers in the terminal window
     hide_signcolumn = true, -- Hide the sign column in the terminal window
   }
 })
-vim.api.nvim_set_keymap('n', '<leader>cc', ':ClaudeCode<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', "<leader>cc", ':ClaudeCode<cr>', { noremap = true, silent = true })
 
 -- completion
 require'cmp'.setup {
