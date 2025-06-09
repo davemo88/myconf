@@ -34,24 +34,34 @@ Plug('hrsh7th/nvim-cmp');
 Plug('Canop/nvim-bacon');
 Plug('stevearc/aerial.nvim');
 
-Plug('greggh/claude-code.nvim');
+--Plug('greggh/claude-code.nvim');
+Plug('coder/claudecode.nvim');
+Plug('folke/snacks.nvim');
 
 vim.call('plug#end')
 
 -- colors
 vim.cmd[[colorscheme tokyonight-night]]
 
--- claude
-require('claude-code').setup({
-  -- Terminal window settings
-  window = {
-    position = "botright vsplit",  -- Position of the window: "botright", "topleft", "vertical", "rightbelow vsplit", etc.
-    enter_insert = true,    -- Whether to enter insert mode when opening Claude Code
-    hide_numbers = true,    -- Hide line numbers in the terminal window
-    hide_signcolumn = true, -- Hide the sign column in the terminal window
-  }
+require('claudecode').setup({
+    terminal = {
+          split_width_percentage = 0.5,
+          provider = "snacks", -- or "native"
+        },
 })
-vim.api.nvim_set_keymap('n', '<leader>cc', ':ClaudeCode<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap(  't'  ,  '<Leader><ESC>'  ,  '<C-\\><C-n>'  ,  {noremap = true}  )
+-- claude
+--require('claude-code').setup({
+--  -- Terminal window settings
+--  window = {
+--    position = "botright vsplit",  -- Position of the window: "botright", "topleft", "vertical", "rightbelow vsplit", etc.
+--    split_width_percentage = 0.5,
+--    enter_insert = true,    -- Whether to enter insert mode when opening Claude Code
+--    hide_numbers = true,    -- Hide line numbers in the terminal window
+--    hide_signcolumn = true, -- Hide the sign column in the terminal window
+--  }
+--})
+vim.api.nvim_set_keymap('n', '<leader>C', ':ClaudeCode<cr>', { noremap = true, silent = true })
 
 -- completion
 require'cmp'.setup {
