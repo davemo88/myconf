@@ -169,10 +169,13 @@ vim.opt.grepformat = "%f:%l:%c:%m"
 -- fixed gutter
 vim.opt.signcolumn = "yes"
 
+vim.env.FZF_DEFAULT_COMMAND = 'fd --type f --hidden --follow --exclude .git'
+
 vim.api.nvim_create_autocmd("VimEnter", {
     callback = function()
         -- Check if there are no files in the arguments
         if vim.fn.argc() == 0 then
+            vim.cmd("ClaudeCode")
             vim.cmd("FZF")
         end
     end,
