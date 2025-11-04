@@ -63,6 +63,7 @@ require('claudecode').setup({
 vim.api.nvim_set_keymap('n', "<leader>cc", ':ClaudeCode<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', "<leader>cf", ':ClaudeCodeFocus<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', "<leader>cs", ':ClaudeCodeSend<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('t', "<Leader><ESC>", '<C-\\><C-n>'  , {noremap = true, silent = true})
 
 -- Claude Code terminal-specific keybindings for insert mode navigation
 vim.api.nvim_create_autocmd("TermOpen", {
