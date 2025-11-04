@@ -34,7 +34,8 @@ Plug('hrsh7th/nvim-cmp');
 Plug('Canop/nvim-bacon');
 Plug('stevearc/aerial.nvim');
 
-Plug('greggh/claude-code.nvim');
+Plug('folke/snacks.nvim');
+Plug('coder/claudecode.nvim');
 
 Plug 'stevearc/dressing.nvim'
 Plug 'nvim-flutter/flutter-tools.nvim'
@@ -44,18 +45,46 @@ vim.call('plug#end')
 -- colors
 vim.cmd[[colorscheme tokyonight-night]]
 
--- claude
-require('claude-code').setup({
-  -- Terminal window settings
-  window = {
-    split_ratio = 0.5,
-    position = "botright vsplit",  -- Position of the window: "botright", "topleft", "vertical", "rightbelow vsplit", etc.
-    enter_insert = true,    -- Whether to enter insert mode when opening Claude Code
-    hide_numbers = true,    -- Hide line numbers in the terminal window
-    hide_signcolumn = true, -- Hide the sign column in the terminal window
-  }
+-- claudecode
+require('claudecode').setup({
+  terminal = {
+    split_side = "right",
+    split_width_percentage = 0.5,
+    provider = "auto",  -- Uses snacks.nvim when available
+  },
+  server = {
+    auto_start = true,
+    log_level = "info",
+  },
+  diff_opts = {
+    vertical_split = false,
+  },
 })
 vim.api.nvim_set_keymap('n', "<leader>cc", ':ClaudeCode<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', "<leader>cf", ':ClaudeCodeFocus<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('v', "<leader>cs", ':ClaudeCodeSend<cr>', { noremap = true, silent = true })
+
+-- Claude Code terminal-specific keybindings for insert mode navigation
+vim.api.nvim_create_autocmd("TermOpen", {
+  pattern = "*",
+  callback = function()
+    local bufname = vim.api.nvim_buf_get_name(0)
+    -- Check if this is a Claude Code terminal buffer
+    if bufname:match("claudecode") or bufname:match("ClaudeCode") then
+      -- Set buffer-local insert mode keymaps for quick window navigation
+      vim.api.nvim_buf_set_keymap(0, 'i', '<C-w>h', '<Esc><C-w>h', { noremap = true, silent = true })
+      vim.api.nvim_buf_set_keymap(0, 'i', '<C-w>j', '<Esc><C-w>j', { noremap = true, silent = true })
+      vim.api.nvim_buf_set_keymap(0, 'i', '<C-w>k', '<Esc><C-w>k', { noremap = true, silent = true })
+      vim.api.nvim_buf_set_keymap(0, 'i', '<C-w>l', '<Esc><C-w>l', { noremap = true, silent = true })
+    end
+  end,
+})
+
+-- Terminal mode window navigation
+vim.api.nvim_set_keymap('t', '<C-w>h', '<C-\\><C-n><C-w>h', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('t', '<C-w>j', '<C-\\><C-n><C-w>j', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('t', '<C-w>k', '<C-\\><C-n><C-w>k', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('t', '<C-w>l', '<C-\\><C-n><C-w>l', { noremap = true, silent = true })
 
 -- completion
 require'cmp'.setup {
