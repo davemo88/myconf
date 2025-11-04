@@ -36,6 +36,9 @@ Plug('stevearc/aerial.nvim');
 
 Plug('greggh/claude-code.nvim');
 
+Plug 'stevearc/dressing.nvim'
+Plug 'nvim-flutter/flutter-tools.nvim'
+
 vim.call('plug#end')
 
 -- colors
@@ -64,13 +67,15 @@ require'cmp'.setup {
 require("typescript-tools").setup{}
 
 vim.api.nvim_create_autocmd("FileType", {
-    pattern = { "typescript", "typescriptreact" },
+    pattern = { "typescript", "typescriptreact", "dart" },
     callback = function()
         vim.bo.tabstop = 2
         vim.bo.shiftwidth = 2
         vim.bo.expandtab = true
     end,
 })
+
+require("flutter-tools").setup {}
 
 -- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers..
 local capabilities = require('cmp_nvim_lsp').default_capabilities()
