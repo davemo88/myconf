@@ -87,6 +87,16 @@ vim.api.nvim_set_keymap('t', '<C-w>j', '<C-\\><C-n><C-w>j', { noremap = true, si
 vim.api.nvim_set_keymap('t', '<C-w>k', '<C-\\><C-n><C-w>k', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('t', '<C-w>l', '<C-\\><C-n><C-w>l', { noremap = true, silent = true })
 
+-- completion capabilities
+local capabilities = require('cmp_nvim_lsp').default_capabilities()
+
+-- rustaceanvim configuration
+vim.g.rustaceanvim = {
+  server = {
+    capabilities = capabilities,
+  },
+}
+
 -- completion
 require'cmp'.setup {
   sources = {
@@ -94,7 +104,9 @@ require'cmp'.setup {
   }
 }
 
-require("typescript-tools").setup{}
+require("typescript-tools").setup{
+  capabilities = capabilities,
+}
 
 vim.api.nvim_create_autocmd("FileType", {
     pattern = { "typescript", "typescriptreact", "dart" },
@@ -105,10 +117,22 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
-require("flutter-tools").setup {}
+require("flutter-tools").setup {
+  lsp = {
+    capabilities = capabilities,
+  }
+}
+
+vim.api.nvim_create_autocmd("FileType", {
+    pattern = { "dart" },
+    callback = function()
+        vim.bo.tabstop = 2
+        vim.bo.shiftwidth = 2
+        vim.bo.expandtab = true
+    end,
+})
 
 -- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers..
-local capabilities = require('cmp_nvim_lsp').default_capabilities()
 local cmp = require'cmp'
 cmp.setup({
   -- Enable LSP snippets
