@@ -10,3 +10,6 @@ function fish_mode_prompt
 end
 alias bat=batcat
 alias vi=nvim
+
+# The next line updates PATH for the Google Cloud SDK.
+if [ -f '/Users/david/Downloads/google-cloud-sdk/path.fish.inc' ]; . '/Users/david/Downloads/google-cloud-sdk/path.fish.inc'; end
