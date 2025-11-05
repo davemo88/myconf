@@ -35,7 +35,7 @@ Plug('Canop/nvim-bacon');
 Plug('stevearc/aerial.nvim');
 
 Plug('folke/snacks.nvim');
-Plug('coder/claudecode.nvim');
+Plug('davemo88/claudecode.nvim');
 
 Plug('ibhagwan/fzf-lua');
 Plug('pittcat/claude-fzf.nvim');
@@ -266,94 +266,6 @@ vim.opt.grepformat = "%f:%l:%c:%m"
 
 -- fixed gutter
 vim.opt.signcolumn = "yes"
-
--- Auto-reload buffers when files change externally
-vim.opt.autoread = true
-
--- Timer-based file change detection
-local file_check_timer = nil
-local original_updatetime = vim.o.updatetime
-local claude_terminal_active = false
-
--- Function to check for file changes
-local function check_file_changes()
-  if claude_terminal_active then
-    -- Check all buffers for external changes
-    for _, buf in ipairs(vim.api.nvim_list_bufs()) do
-      if vim.api.nvim_buf_is_loaded(buf) and vim.api.nvim_buf_get_option(buf, 'buftype') == '' then
-        local bufname = vim.api.nvim_buf_get_name(buf)
-        if bufname ~= '' and vim.fn.filereadable(bufname) == 1 then
-          -- Force check for this specific buffer
-          vim.api.nvim_buf_call(buf, function()
-            vim.cmd('silent! checktime')
-          end)
-        end
-      end
-    end
-  end
-end
-
--- Start timer when Claude Code terminal opens
-vim.api.nvim_create_autocmd("TermOpen", {
-  pattern = "*",
-  callback = function()
-    local bufname = vim.api.nvim_buf_get_name(0)
-    if bufname:match("claudecode") or bufname:match("ClaudeCode") or bufname:match("claude") then
-      claude_terminal_active = true
-
-      -- Reduce updatetime for faster change detection
-      original_updatetime = vim.o.updatetime
-      vim.o.updatetime = 100
-
-      -- Start timer if not already running (check every 250ms for faster response)
-      if not file_check_timer then
-        file_check_timer = vim.loop.new_timer()
-        file_check_timer:start(100, 100, vim.schedule_wrap(check_file_changes))
-      end
-    end
-  end,
-})
-
--- Stop timer when Claude Code terminal closes
-vim.api.nvim_create_autocmd("TermClose", {
-  pattern = "*",
-  callback = function()
-    local bufname = vim.api.nvim_buf_get_name(0)
-    if bufname:match("claudecode") or bufname:match("ClaudeCode") or bufname:match("claude") then
-      claude_terminal_active = false
-
-      -- Restore original updatetime
-      vim.o.updatetime = original_updatetime
-
-      -- Stop timer
-      if file_check_timer then
-        file_check_timer:stop()
-        file_check_timer:close()
-        file_check_timer = nil
-      end
-    end
-  end,
-})
-
--- Also trigger checktime on various events for immediate detection
-vim.api.nvim_create_autocmd({ "FocusGained", "BufEnter", "CursorHold", "CursorHoldI", "TermLeave" }, {
-  pattern = "*",
-  callback = function()
-    if vim.fn.mode() ~= "c" then
-      vim.cmd("checktime")
-    end
-  end,
-})
-
--- Show notification and force redraw when files are reloaded
-vim.api.nvim_create_autocmd("FileChangedShellPost", {
-  pattern = "*",
-  callback = function()
-    vim.notify("File reloaded: " .. vim.fn.expand("%:t"), vim.log.levels.INFO)
-    -- Force screen redraw to show changes immediately
-    vim.cmd("redraw")
-  end,
-})
 
 vim.env.FZF_DEFAULT_COMMAND = 'fd --type f --hidden --follow --exclude .git'
 
