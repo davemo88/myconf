@@ -37,6 +37,9 @@ Plug('stevearc/aerial.nvim');
 Plug('folke/snacks.nvim');
 Plug('coder/claudecode.nvim');
 
+Plug('ibhagwan/fzf-lua');
+Plug('pittcat/claude-fzf.nvim');
+
 Plug 'stevearc/dressing.nvim'
 Plug 'nvim-flutter/flutter-tools.nvim'
 
@@ -44,6 +47,22 @@ vim.call('plug#end')
 
 -- colors
 vim.cmd[[colorscheme tokyonight-night]]
+
+-- snacks.nvim configuration
+if not vim.g.snacks_did_setup then
+  require("snacks").setup({
+    terminal = {
+      win = {
+        style = {
+          wo = {
+            winbar = "",  -- Hide the winbar which shows term://
+          }
+        }
+      }
+    }
+  })
+  vim.g.snacks_did_setup = true
+end
 
 -- claudecode
 require('claudecode').setup({
@@ -60,18 +79,37 @@ require('claudecode').setup({
     vertical_split = false,
   },
 })
+
 vim.api.nvim_set_keymap('n', "<leader>cc", ':ClaudeCode<cr>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', "<leader>cf", ':ClaudeCodeFocus<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', "<leader>ct", ':ClaudeCodeFocus<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('v', "<leader>cs", ':ClaudeCodeSend<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('t', "<Leader><ESC>", '<C-\\><C-n>'  , {noremap = true, silent = true})
 
--- Claude Code terminal-specific keybindings for insert mode navigation
+-- claude-fzf.nvim
+require('claude-fzf').setup({
+  auto_context = true,
+  batch_size = 10,
+})
+
+vim.api.nvim_set_keymap('n', '<leader>cf', ':ClaudeFzfFiles<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>cg', ':ClaudeFzfGrep<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>cb', ':ClaudeFzfBuffers<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>cgf', ':ClaudeFzfGitFiles<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('n', '<leader>cd', ':ClaudeFzfDirectory<cr>', { noremap = true, silent = true })
+
+-- Claude Code terminal-specific keybindings and cleanup
 vim.api.nvim_create_autocmd("TermOpen", {
   pattern = "*",
   callback = function()
+    -- Hide statusline and set cleaner buffer name
+    vim.opt_local.statusline = " "
+
     local bufname = vim.api.nvim_buf_get_name(0)
     -- Check if this is a Claude Code terminal buffer
-    if bufname:match("claudecode") or bufname:match("ClaudeCode") then
+    if bufname:match("claudecode") or bufname:match("ClaudeCode") or bufname:match("claude") then
+      -- Rename the buffer to something cleaner
+      pcall(vim.api.nvim_buf_set_name, 0, "Claude Code")
+
       -- Set buffer-local insert mode keymaps for quick window navigation
       vim.api.nvim_buf_set_keymap(0, 'i', '<C-w>h', '<Esc><C-w>h', { noremap = true, silent = true })
       vim.api.nvim_buf_set_keymap(0, 'i', '<C-w>j', '<Esc><C-w>j', { noremap = true, silent = true })
