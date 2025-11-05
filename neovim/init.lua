@@ -1,6 +1,9 @@
 local vim = vim
 local Plug = vim.fn['plug#']
 
+-- Set leader key FIRST before any keymaps
+vim.g.mapleader = ","
+
 -- plugins
 vim.call('plug#begin')
 
@@ -215,8 +218,6 @@ require("aerial").setup({
 })
 
 -- keybindings
-vim.g.mapleader = ","
-
 vim.api.nvim_create_user_command('W', 'w', {})
 vim.api.nvim_create_user_command('Q', 'q', {})
 
