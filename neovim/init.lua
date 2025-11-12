@@ -1,9 +1,6 @@
 local vim = vim
 local Plug = vim.fn['plug#']
 
--- Set leader key FIRST before any keymaps
-vim.g.mapleader = ","
-
 -- plugins
 vim.call('plug#begin')
 
@@ -47,6 +44,8 @@ Plug 'stevearc/dressing.nvim'
 Plug 'nvim-flutter/flutter-tools.nvim'
 
 vim.call('plug#end')
+
+vim.g.mapleader = ","
 
 -- colors
 vim.cmd[[colorscheme tokyonight-night]]
