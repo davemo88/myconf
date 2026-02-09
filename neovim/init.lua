@@ -79,6 +79,7 @@ require('claudecode').setup({
   },
   diff_opts = {
     vertical_split = false,
+    keep_terminal_focus = true,
   },
 })
 
@@ -268,6 +269,53 @@ vim.opt.grepformat = "%f:%l:%c:%m"
 vim.opt.signcolumn = "yes"
 
 vim.env.FZF_DEFAULT_COMMAND = 'fd --type f --hidden --follow --exclude .git'
+
+-- Floating terminal (persistent)
+local term_buf = nil
+local term_win = nil
+
+vim.api.nvim_create_user_command('Term', function()
+  -- If window is open, close it
+  if term_win and vim.api.nvim_win_is_valid(term_win) then
+    vim.api.nvim_win_close(term_win, false)
+    term_win = nil
+    return
+  end
+
+  local width = math.floor(vim.o.columns * 0.8)
+  local height = math.floor(vim.o.lines * 0.8)
+
+  -- Check if buffer exists and is valid
+  if term_buf and vim.api.nvim_buf_is_valid(term_buf) then
+    -- Reopen window with existing buffer
+    term_win = vim.api.nvim_open_win(term_buf, true, {
+      relative = 'editor',
+      width = width,
+      height = height,
+      col = math.floor((vim.o.columns - width) / 2),
+      row = math.floor((vim.o.lines - height) / 2),
+      style = 'minimal',
+      border = 'rounded',
+    })
+  else
+    -- Create new buffer and terminal
+    term_buf = vim.api.nvim_create_buf(false, true)
+    term_win = vim.api.nvim_open_win(term_buf, true, {
+      relative = 'editor',
+      width = width,
+      height = height,
+      col = math.floor((vim.o.columns - width) / 2),
+      row = math.floor((vim.o.lines - height) / 2),
+      style = 'minimal',
+      border = 'rounded',
+    })
+    vim.fn.termopen(vim.o.shell)
+  end
+  vim.cmd('startinsert')
+end, {})
+
+vim.keymap.set('n', '<leader>t', ':Term<CR>', { silent = true })
+vim.keymap.set('t', '<leader>t', '<C-\\><C-n>:Term<CR>', { silent = true })
 
 vim.api.nvim_create_autocmd("VimEnter", {
     callback = function()
