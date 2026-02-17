@@ -322,7 +322,6 @@ vim.api.nvim_create_autocmd("VimEnter", {
         -- Check if there are no files in the arguments
         if vim.fn.argc() == 0 then
             vim.cmd("ClaudeCode")
-            vim.cmd("FZF")
         end
     end,
 })
