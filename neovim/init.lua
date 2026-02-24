@@ -174,6 +174,15 @@ vim.api.nvim_create_autocmd("FileType", {
     end,
 })
 
+-- Flutter hot reload/restart via tmux
+vim.keymap.set('n', '<leader>hr', function()
+  vim.fn.system("tmux send-keys -t dartvm r")
+end, { desc = "Flutter hot reload" })
+
+vim.keymap.set('n', '<leader>hR', function()
+  vim.fn.system("tmux send-keys -t dartvm R")
+end, { desc = "Flutter hot restart" })
+
 -- The nvim-cmp almost supports LSP's capabilities so You should advertise it to LSP servers..
 local cmp = require'cmp'
 cmp.setup({
