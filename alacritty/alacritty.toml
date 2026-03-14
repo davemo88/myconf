@@ -1,2 +1,14 @@
 [font]
-size = 20.0
+size = 20
+
+[font.offset]
+y = -3
+
+[font.normal]
+family = "MesloLGS Nerd Font"
+style = "Regular"
+
+[terminal]
+
+[terminal.shell]
+program = "/opt/homebrew/bin/fish"
