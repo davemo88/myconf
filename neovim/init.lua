@@ -233,6 +233,8 @@ vim.api.nvim_create_user_command('Q', 'q', {})
 vim.api.nvim_set_keymap('n', '<leader>f', ':FZF<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>F', ':FZF ~<cr>', { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>r', ':Rg<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('t', '<leader>f', '<C-\\><C-n>:FZF<cr>', { noremap = true, silent = true })
+vim.api.nvim_set_keymap('t', '<leader>r', '<C-\\><C-n>:Rg<cr>', { noremap = true, silent = true })
 
 vim.keymap.set("n", "<leader>a", "<cmd>AerialToggle!<CR>")
 
@@ -331,6 +333,7 @@ vim.api.nvim_create_autocmd("VimEnter", {
         -- Check if there are no files in the arguments
         if vim.fn.argc() == 0 then
             vim.cmd("ClaudeCode")
+            vim.cmd("only")
         end
     end,
 })
