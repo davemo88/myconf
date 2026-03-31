@@ -230,11 +230,36 @@ require("aerial").setup({
 vim.api.nvim_create_user_command('W', 'w', {})
 vim.api.nvim_create_user_command('Q', 'q', {})
 
-vim.api.nvim_set_keymap('n', '<leader>f', ':FZF<cr>', { noremap = true, silent = true })
+local function close_fzf()
+  for _, win in ipairs(vim.api.nvim_list_wins()) do
+    local buf = vim.api.nvim_win_get_buf(win)
+    if vim.api.nvim_get_option_value('filetype', { buf = buf }) == 'fzf' then
+      vim.api.nvim_win_close(win, true)
+      return true
+    end
+  end
+  return false
+end
+
+vim.keymap.set('n', '<leader>f', function()
+  if not close_fzf() then vim.cmd('FZF') end
+end, { noremap = true, silent = true })
 vim.api.nvim_set_keymap('n', '<leader>F', ':FZF ~<cr>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('n', '<leader>r', ':Rg<cr>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('t', '<leader>f', '<C-\\><C-n>:FZF<cr>', { noremap = true, silent = true })
-vim.api.nvim_set_keymap('t', '<leader>r', '<C-\\><C-n>:Rg<cr>', { noremap = true, silent = true })
+vim.keymap.set('n', '<leader>r', function()
+  if not close_fzf() then vim.cmd('Rg') end
+end, { noremap = true, silent = true })
+vim.keymap.set('t', '<leader>f', function()
+  if not close_fzf() then
+    local keys = vim.api.nvim_replace_termcodes('<C-\\><C-n>:FZF<CR>', true, true, true)
+    vim.api.nvim_feedkeys(keys, 'n', false)
+  end
+end, { noremap = true, silent = true })
+vim.keymap.set('t', '<leader>r', function()
+  if not close_fzf() then
+    local keys = vim.api.nvim_replace_termcodes('<C-\\><C-n>:Rg<CR>', true, true, true)
+    vim.api.nvim_feedkeys(keys, 'n', false)
+  end
+end, { noremap = true, silent = true })
 
 vim.keymap.set("n", "<leader>a", "<cmd>AerialToggle!<CR>")
 
