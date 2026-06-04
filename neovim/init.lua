@@ -20,6 +20,7 @@ Plug('rcarriga/nvim-dap-ui');
 Plug('mrcjkb/rustaceanvim');
 
 Plug('hashivim/vim-terraform');
+Plug('souffle-lang/souffle.vim');  -- Soufflé Datalog (.dl) filetype + syntax
 
 Plug('folke/tokyonight.nvim');
 
@@ -50,36 +51,9 @@ vim.g.mapleader = ","
 -- colors
 vim.cmd[[colorscheme tokyonight-night]]
 
--- treesitter: register Soufflé Datalog parser (nvim-treesitter `main` branch API)
--- Custom parsers must be registered inside a `User TSUpdate` autocommand.
-vim.api.nvim_create_autocmd("User", {
-  pattern = "TSUpdate",
-  callback = function()
-    require("nvim-treesitter.parsers").souffle = {
-      install_info = {
-        url = "https://github.com/langston-barrett/tree-sitter-souffle",
-        branch = "main",
-        -- the repo ships a pre-generated src/parser.c, so no `generate` needed
-      },
-    }
-  end,
-})
-
--- Soufflé uses the .dl extension
-vim.filetype.add({
-  extension = {
-    dl = "souffle",
-  },
-})
-
--- start treesitter highlighting for souffle buffers
-vim.api.nvim_create_autocmd("FileType", {
-  pattern = { "souffle" },
-  callback = function()
-    pcall(vim.treesitter.start)
-  end,
-})
--- Run `:TSInstall souffle` once to build the parser.
+-- Soufflé (.dl): filetype detection and syntax highlighting come from the
+-- official souffle-lang/souffle.vim plugin (added above). It also highlights
+-- the C-preprocessor lines (#include/#define) that real .dl files use.
 
 -- snacks.nvim configuration
 if not vim.g.snacks_did_setup then
