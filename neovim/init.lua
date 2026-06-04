@@ -50,6 +50,37 @@ vim.g.mapleader = ","
 -- colors
 vim.cmd[[colorscheme tokyonight-night]]
 
+-- treesitter: register Soufflé Datalog parser (nvim-treesitter `main` branch API)
+-- Custom parsers must be registered inside a `User TSUpdate` autocommand.
+vim.api.nvim_create_autocmd("User", {
+  pattern = "TSUpdate",
+  callback = function()
+    require("nvim-treesitter.parsers").souffle = {
+      install_info = {
+        url = "https://github.com/langston-barrett/tree-sitter-souffle",
+        branch = "main",
+        -- the repo ships a pre-generated src/parser.c, so no `generate` needed
+      },
+    }
+  end,
+})
+
+-- Soufflé uses the .dl extension
+vim.filetype.add({
+  extension = {
+    dl = "souffle",
+  },
+})
+
+-- start treesitter highlighting for souffle buffers
+vim.api.nvim_create_autocmd("FileType", {
+  pattern = { "souffle" },
+  callback = function()
+    pcall(vim.treesitter.start)
+  end,
+})
+-- Run `:TSInstall souffle` once to build the parser.
+
 -- snacks.nvim configuration
 if not vim.g.snacks_did_setup then
   require("snacks").setup({
