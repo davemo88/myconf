@@ -1,4 +1,7 @@
+# Only auto-attach tmux in alacritty (which exports ALACRITTY_WINDOW_ID).
+# This keeps cmux (and other terminals) out of tmux so each pane is independent.
 if status is-interactive
+    and set -q ALACRITTY_WINDOW_ID
     set fish_tmux_autostart true
 end
 set -U fish_greeting ""
