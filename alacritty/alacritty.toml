@@ -8,6 +8,10 @@ y = -3
 family = "MesloLGS Nerd Font"
 style = "Regular"
 
+[window]
+# Make the Option (⌥) key send Alt/Meta so Ctrl-Alt-* keybindings work.
+option_as_alt = "Both"
+
 [terminal]
 
 [terminal.shell]

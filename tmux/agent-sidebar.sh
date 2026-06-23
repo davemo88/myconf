@@ -33,7 +33,7 @@ while :; do
     bar="  "; fg="$RESET"
     [ "$active" = "1" ] && { bar=" ${ACTIVE}▌${RESET}"; fg="$ACTIVE"; }
     bell=""
-    [ "${alert:-}" = "1" ] && { bell="  ${ALERT}🔔${RESET}"; fg="$ALERT"; }
+    [ "${alert:-}" = "1" ] && { bell="  🟡"; fg="$ALERT"; }
 
     buf+="${bar}${fg}${idx}·${name}${RESET}${bell}${NL}"
     [ -n "$base" ] && buf+="    ${DIM}${base}${RESET}${NL}"
