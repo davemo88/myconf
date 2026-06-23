@@ -17,6 +17,12 @@ NL=$'\n'
 SPIN=(⠋ ⠙ ⠹ ⠸ ⠼ ⠴ ⠦ ⠧ ⠇ ⠏)
 tick=0
 
+# Wake instantly when tmux pokes us (e.g. the current window changed) by killing
+# the in-progress sleep — see agent-sidebar-poke.sh. Without this the active-row
+# marker would only catch up on the next ~1s poll.
+sleep_pid=""
+trap 'kill "$sleep_pid" 2>/dev/null' USR1
+
 branch_of() {
   git -C "$1" symbolic-ref --quiet --short HEAD 2>/dev/null \
     || git -C "$1" rev-parse --short HEAD 2>/dev/null
@@ -60,5 +66,7 @@ while :; do
 
   printf '%s%s' "${E}[H${E}[2J" "$buf"
   tick=$((tick + 1))
-  sleep 1
+  # Interruptible sleep: a SIGUSR1 poke kills it so we redraw immediately.
+  sleep 1 & sleep_pid=$!
+  wait "$sleep_pid" 2>/dev/null
 done

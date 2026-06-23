@@ -19,6 +19,8 @@ stopped) is shown dimmed beneath it. The active window is marked with a cyan `�
 - `agent-sidebar-ensure.sh` — idempotently injects the sidebar pane into a window.
 - `agent-state.sh` — sets the per-window state flags; called from Claude Code hooks.
 - `agent-jump.sh` — selects the next window with a pending alert (`Ctrl+Alt+u`).
+- `agent-sidebar-poke.sh` — SIGUSR1s every rail to redraw now (hooked to window
+  switches so the active-row marker moves instantly instead of on the ~1s poll).
 - `tmux.conf` — hooks/keybindings that spawn the sidebar.
 
 The sidebar reads three per-window tmux options:
@@ -40,6 +42,7 @@ ln -sf "$PWD/agent-sidebar.sh"        ~/.config/tmux/agent-sidebar.sh
 ln -sf "$PWD/agent-sidebar-ensure.sh" ~/.config/tmux/agent-sidebar-ensure.sh
 ln -sf "$PWD/agent-state.sh"          ~/.config/tmux/agent-state.sh
 ln -sf "$PWD/agent-jump.sh"           ~/.config/tmux/agent-jump.sh
+ln -sf "$PWD/agent-sidebar-poke.sh"   ~/.config/tmux/agent-sidebar-poke.sh
 ln -sf "$PWD/tmux.conf"               ~/.tmux.conf
 tmux source-file ~/.tmux.conf
 # Backfill the sidebar onto existing windows:  Ctrl+Alt+a
