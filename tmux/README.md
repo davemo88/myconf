@@ -4,8 +4,8 @@ A left-edge vertical "tab" rail injected into every tmux window. For each window
 in the session it shows the index/name, cwd, git branch, a per-window agent
 status marker, and the latest notification text while alerting:
 
-- `🟡` — the agent **needs input** / has finished (alert)
-- `⠋⠙⠹…` (animated braille spinner) — the agent is **working** (busy)
+- `💬` — the agent **needs input** / has finished (alert)
+- `🚧` — the agent is **working** (busy)
 - nothing — idle
 
 While a window is alerting, the latest notification message (e.g. why the agent
@@ -27,8 +27,9 @@ The sidebar reads three per-window tmux options:
 
 | option         | meaning                              | shown as          |
 |----------------|--------------------------------------|-------------------|
-| `@agent_alert` | agent needs input / finished         | `🟡`              |
-| `@agent_busy`  | agent is actively working            | spinner           |
+| `@agent_alert` | agent needs input / finished         | `💬`              |
+| `@agent_busy`  | agent is actively working            | `🚧`              |
+| `@agent_busy_at` | epoch of last busy heartbeat       | (TTL backstop)    |
 | `@agent_msg`   | latest notification text (on alert)  | dimmed text line  |
 
 `@agent_alert` takes precedence over `@agent_busy` when both are set.
@@ -63,7 +64,16 @@ existing `hooks` you already have):
     "PreToolUse": [
       { "hooks": [ { "type": "command", "command": "~/.config/tmux/agent-state.sh working" } ] }
     ],
+    "PostToolUse": [
+      { "hooks": [ { "type": "command", "command": "~/.config/tmux/agent-state.sh working" } ] }
+    ],
     "Stop": [
+      { "hooks": [ { "type": "command", "command": "~/.config/tmux/agent-state.sh attention" } ] }
+    ],
+    "StopFailure": [
+      { "hooks": [ { "type": "command", "command": "~/.config/tmux/agent-state.sh attention" } ] }
+    ],
+    "PostToolUseFailure": [
       { "hooks": [ { "type": "command", "command": "~/.config/tmux/agent-state.sh attention" } ] }
     ],
     "Notification": [
@@ -75,19 +85,29 @@ existing `hooks` you already have):
 
 What each hook does:
 
-- **UserPromptSubmit** → `working`: you submitted a prompt; show the spinner.
-- **PreToolUse** → `working`: the agent is running tools. This also re-clears a
-  stale `🟡` when you unblock a paused agent (e.g. approving a permission), since
-  that resumes work via `PreToolUse` but does *not* fire `UserPromptSubmit`.
-- **Stop** → `attention`: the turn ended; raise `🟡`.
+- **UserPromptSubmit** → `working`: you submitted a prompt; show the 🚧 marker.
+- **PreToolUse** / **PostToolUse** → `working`: the agent is running tools. This
+  re-clears a stale `💬` when you unblock a paused agent (e.g. approving a
+  permission), and refreshes the busy *heartbeat* (see below).
+- **Stop** → `attention`: the turn ended; raise `💬`.
+- **StopFailure** / **PostToolUseFailure** → `attention`: the turn or a tool was
+  aborted (this is what catches an interrupted/cancelled action — Claude Code has
+  no dedicated cancel hook).
 - **Notification** → `attention`: the agent is waiting on you (permission/idle);
-  raise `🟡`.
+  raise `💬`.
 
 The `attention` calls also read the hook's JSON payload from stdin (piped
 automatically by Claude Code) and stash its `message` in `@agent_msg`, so the
 sidebar shows *why* the agent stopped. No extra hook wiring is needed.
 
+**Cancel recovery.** Because there is no cancel hook, an interrupted turn can
+leave `@agent_busy` stuck. Two safety nets handle this: the `*Failure` hooks flip
+to `💬` immediately when a tool/turn aborts, and `working` writes a `@agent_busy_at`
+heartbeat so the renderer downgrades a busy state with no refresh for `BUSY_TTL`
+(90s, in `agent-sidebar.sh`) back to the ready bubble. To recover one window now,
+`Ctrl+Alt+c` clears its markers.
+
 Hooks are read when a Claude Code session starts, so restart existing sessions
-to pick up changes. Clear a marker manually any time with `Ctrl+Alt+c`.
+to pick up changes.
 
 A ready-to-merge copy of this block lives in `settings.sample.json`.

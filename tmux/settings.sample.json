@@ -7,7 +7,16 @@
     "PreToolUse": [
       { "hooks": [ { "type": "command", "command": "~/.config/tmux/agent-state.sh working" } ] }
     ],
+    "PostToolUse": [
+      { "hooks": [ { "type": "command", "command": "~/.config/tmux/agent-state.sh working" } ] }
+    ],
     "Stop": [
+      { "hooks": [ { "type": "command", "command": "~/.config/tmux/agent-state.sh attention" } ] }
+    ],
+    "StopFailure": [
+      { "hooks": [ { "type": "command", "command": "~/.config/tmux/agent-state.sh attention" } ] }
+    ],
+    "PostToolUseFailure": [
       { "hooks": [ { "type": "command", "command": "~/.config/tmux/agent-state.sh attention" } ] }
     ],
     "Notification": [

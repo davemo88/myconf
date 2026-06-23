@@ -1,6 +1,6 @@
 #!/usr/bin/env bash
 # Jump to the next window (after the current one, wrapping) whose agent has a
-# pending 🟡 alert. No-op when nothing is alerting. Mirrors cmux's ⌘⇧U.
+# pending 💬 alert. No-op when nothing is alerting. Mirrors cmux's ⌘⇧U.
 set -u
 
 sess=$(tmux display -p '#{session_id}')
