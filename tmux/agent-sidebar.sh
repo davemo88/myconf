@@ -32,7 +32,7 @@ while :; do
   frame="${SPIN[$((tick % ${#SPIN[@]}))]}"
 
   buf="${DIM} windows${RESET}${NL}"
-  while IFS=$'\t' read -r idx active name path alert busy; do
+  while IFS=$'\t' read -r idx active name path alert busy msg; do
     base=""; [ -n "${path:-}" ] && base=$(basename "$path")
     br="";   [ -n "${path:-}" ] && br=$(branch_of "$path")
 
@@ -49,9 +49,14 @@ while :; do
     buf+="${bar}${fg}${idx}·${name}${RESET}${mark}${NL}"
     [ -n "$base" ] && buf+="    ${DIM}${base}${RESET}${NL}"
     [ -n "$br" ]   && buf+="    ${BRANCH}⎇ ${br}${RESET}${NL}"
+    # Latest notification text — only while the window is alerting.
+    if [ "${alert:-}" = "1" ] && [ -n "${msg:-}" ]; then
+      short="$msg"; [ ${#short} -gt 20 ] && short="${short:0:19}…"
+      buf+="    ${DIM}${short}${RESET}${NL}"
+    fi
     buf+="${NL}"
   done < <(tmux list-windows -t "$sess" \
-            -F $'#{window_index}\t#{window_active}\t#{window_name}\t#{pane_current_path}\t#{@agent_alert}\t#{@agent_busy}' 2>/dev/null)
+            -F $'#{window_index}\t#{window_active}\t#{window_name}\t#{pane_current_path}\t#{@agent_alert}\t#{@agent_busy}\t#{@agent_msg}' 2>/dev/null)
 
   printf '%s%s' "${E}[H${E}[2J" "$buf"
   tick=$((tick + 1))

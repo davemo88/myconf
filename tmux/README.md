@@ -1,28 +1,33 @@
 # tmux agent sidebar
 
 A left-edge vertical "tab" rail injected into every tmux window. For each window
-in the session it shows the index/name, cwd, git branch, and a per-window agent
-status marker:
+in the session it shows the index/name, cwd, git branch, a per-window agent
+status marker, and the latest notification text while alerting:
 
 - `🟡` — the agent **needs input** / has finished (alert)
 - `⠋⠙⠹…` (animated braille spinner) — the agent is **working** (busy)
 - nothing — idle
 
-The active window is marked with a cyan `▌`.
+While a window is alerting, the latest notification message (e.g. why the agent
+stopped) is shown dimmed beneath it. The active window is marked with a cyan `▌`.
+
+`Ctrl+Alt+u` jumps to the next alerting window (cmux's `⌘⇧U`).
 
 ## Files
 
 - `agent-sidebar.sh` — the renderer that runs inside the sidebar pane (redraws ~1s).
 - `agent-sidebar-ensure.sh` — idempotently injects the sidebar pane into a window.
 - `agent-state.sh` — sets the per-window state flags; called from Claude Code hooks.
+- `agent-jump.sh` — selects the next window with a pending alert (`Ctrl+Alt+u`).
 - `tmux.conf` — hooks/keybindings that spawn the sidebar.
 
-The sidebar reads two per-window tmux options:
+The sidebar reads three per-window tmux options:
 
-| option         | meaning                          | marker  |
-|----------------|----------------------------------|---------|
-| `@agent_alert` | agent needs input / finished     | `🟡`    |
-| `@agent_busy`  | agent is actively working        | spinner |
+| option         | meaning                              | shown as          |
+|----------------|--------------------------------------|-------------------|
+| `@agent_alert` | agent needs input / finished         | `🟡`              |
+| `@agent_busy`  | agent is actively working            | spinner           |
+| `@agent_msg`   | latest notification text (on alert)  | dimmed text line  |
 
 `@agent_alert` takes precedence over `@agent_busy` when both are set.
 
@@ -34,6 +39,7 @@ Symlink (or copy) the scripts and config into place:
 ln -sf "$PWD/agent-sidebar.sh"        ~/.config/tmux/agent-sidebar.sh
 ln -sf "$PWD/agent-sidebar-ensure.sh" ~/.config/tmux/agent-sidebar-ensure.sh
 ln -sf "$PWD/agent-state.sh"          ~/.config/tmux/agent-state.sh
+ln -sf "$PWD/agent-jump.sh"           ~/.config/tmux/agent-jump.sh
 ln -sf "$PWD/tmux.conf"               ~/.tmux.conf
 tmux source-file ~/.tmux.conf
 # Backfill the sidebar onto existing windows:  Ctrl+Alt+a
@@ -73,6 +79,10 @@ What each hook does:
 - **Stop** → `attention`: the turn ended; raise `🟡`.
 - **Notification** → `attention`: the agent is waiting on you (permission/idle);
   raise `🟡`.
+
+The `attention` calls also read the hook's JSON payload from stdin (piped
+automatically by Claude Code) and stash its `message` in `@agent_msg`, so the
+sidebar shows *why* the agent stopped. No extra hook wiring is needed.
 
 Hooks are read when a Claude Code session starts, so restart existing sessions
 to pick up changes. Clear a marker manually any time with `Ctrl+Alt+c`.
